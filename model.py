@@ -5,6 +5,7 @@
 
 import torch.nn as nn
 import torch
+from tfan_module import TFAN_1D, TFAN_2D
 
 
 class GLU(nn.Module):
@@ -155,6 +156,8 @@ class Generator(nn.Module):
                                              nn.InstanceNorm1d(num_features=256,
                                                                affine=True))
 
+        self.conv2dto1dLayer = TFAN_1D()
+
         # Residual Blocks
         self.residualLayer1 = ResidualLayer(in_channels=256,
                                             out_channels=512,
@@ -188,13 +191,20 @@ class Generator(nn.Module):
                                             padding=1)
 
         # 1D -> 2D Conv
+        # self.conv1dto2dLayer = nn.Sequential(nn.Conv1d(in_channels=256,
+        #                                                out_channels=2304,
+        #                                                kernel_size=1,
+        #                                                stride=1,
+        #                                                padding=0),
+        #                                      nn.InstanceNorm1d(num_features=2304,
+        #                                                        affine=True))
+
         self.conv1dto2dLayer = nn.Sequential(nn.Conv1d(in_channels=256,
                                                        out_channels=2304,
                                                        kernel_size=1,
                                                        stride=1,
                                                        padding=0),
-                                             nn.InstanceNorm1d(num_features=2304,
-                                                               affine=True))
+                                             TFAN_1D(2304))
 
         # UpSample Layer
         self.upSample1 = self.upSample(in_channels=256,
@@ -235,9 +245,10 @@ class Generator(nn.Module):
                                                  stride=stride,
                                                  padding=padding),
                                        nn.PixelShuffle(upscale_factor=2),
-                                       nn.InstanceNorm2d(
-                                           num_features=out_channels // 4,
-                                           affine=True),
+                                       TFAN_2D(out_channels // 4),
+                                       # nn.InstanceNorm2d(
+                                       #     num_features=out_channels // 4,
+                                       #     affine=True),
                                        GLU())
         return self.convLayer
 
