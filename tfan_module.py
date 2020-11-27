@@ -36,7 +36,11 @@ def get_norm_layer(opt):
 
 
 class TFAN_1D(nn.Module):
-    def __init__(self, norm_nc, ks, label_nc):
+    """
+    as paper said, it has best performance when N=3, kernal_size in h is 5
+    """
+
+    def __init__(self, norm_nc, ks=5, label_nc=128, N=3):
         super().__init__()
 
         self.param_free_norm = nn.InstanceNorm1d(norm_nc, affine=False)
@@ -45,6 +49,7 @@ class TFAN_1D(nn.Module):
         nhidden = 128
 
         pw = ks // 2
+
         self.mlp_shared = nn.Sequential(
             nn.Conv1d(label_nc, nhidden, kernel_size=ks, padding=pw),
             nn.ReLU()
@@ -58,7 +63,11 @@ class TFAN_1D(nn.Module):
 
         # Part 2. produce scaling and bias conditioned on semantic map
         segmap = F.interpolate(segmap, size=x.size()[2:], mode='nearest')
+
         actv = self.mlp_shared(segmap)
+        actv = self.mlp_shared(actv)
+        actv = self.mlp_shared(actv)
+
         gamma = self.mlp_gamma(actv)
         beta = self.mlp_beta(actv)
 
@@ -69,7 +78,11 @@ class TFAN_1D(nn.Module):
 
 
 class TFAN_2D(nn.Module):
-    def __init__(self, norm_nc, ks, label_nc):
+    """
+    as paper said, it has best performance when N=3, kernal_size in h is 5
+    """
+
+    def __init__(self, norm_nc, ks=5, label_nc=128, N=3):
         super().__init__()
 
         self.param_free_norm = nn.InstanceNorm2d(norm_nc, affine=False)
@@ -91,7 +104,11 @@ class TFAN_2D(nn.Module):
 
         # Part 2. produce scaling and bias conditioned on semantic map
         segmap = F.interpolate(segmap, size=x.size()[2:], mode='nearest')
+
         actv = self.mlp_shared(segmap)
+        actv = self.mlp_shared(actv)
+        actv = self.mlp_shared(actv)
+
         gamma = self.mlp_gamma(actv)
         beta = self.mlp_beta(actv)
 
@@ -99,3 +116,7 @@ class TFAN_2D(nn.Module):
         out = normalized * (1 + gamma) + beta
 
         return out
+
+
+if __name__ == '__main__':
+    tfan_1d = TFAN_1D(2304)
