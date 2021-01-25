@@ -45,6 +45,8 @@ class TFAN_1D(nn.Module):
 
         self.param_free_norm = nn.InstanceNorm1d(norm_nc, affine=False)
 
+        self.repeat_N = N
+
         # The dimension of the intermediate embedding space. Yes, hardcoded.
         nhidden = 128
 
@@ -64,9 +66,11 @@ class TFAN_1D(nn.Module):
         # Part 2. produce scaling and bias conditioned on semantic map
         segmap = F.interpolate(segmap, size=x.size()[2:], mode='nearest')
 
-        actv = self.mlp_shared(segmap)
-        actv = self.mlp_shared(actv)
-        actv = self.mlp_shared(actv)
+        # actv = self.mlp_shared(segmap)
+        temp = segmap
+        for i in range(self.repeat_N):
+            temp = self.mlp_shared(temp)
+        actv = temp
 
         gamma = self.mlp_gamma(actv)
         beta = self.mlp_beta(actv)
@@ -86,6 +90,7 @@ class TFAN_2D(nn.Module):
         super().__init__()
 
         self.param_free_norm = nn.InstanceNorm2d(norm_nc, affine=False)
+        self.repeat_N = N
 
         # The dimension of the intermediate embedding space. Yes, hardcoded.
         nhidden = 128
@@ -105,9 +110,11 @@ class TFAN_2D(nn.Module):
         # Part 2. produce scaling and bias conditioned on semantic map
         segmap = F.interpolate(segmap, size=x.size()[2:], mode='nearest')
 
-        actv = self.mlp_shared(segmap)
-        actv = self.mlp_shared(actv)
-        actv = self.mlp_shared(actv)
+        # actv = self.mlp_shared(segmap)
+        temp = segmap
+        for i in range(self.repeat_N):
+            temp = self.mlp_shared(temp)
+        actv = temp
 
         gamma = self.mlp_gamma(actv)
         beta = self.mlp_beta(actv)
@@ -116,7 +123,3 @@ class TFAN_2D(nn.Module):
         out = normalized * (1 + gamma) + beta
 
         return out
-
-
-if __name__ == '__main__':
-    tfan_1d = TFAN_1D(2304)
