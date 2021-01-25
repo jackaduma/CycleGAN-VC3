@@ -369,7 +369,7 @@ class Discriminator(nn.Module):
 
         self.downSample4 = self.downSample(in_channels=1024,
                                            out_channels=1024,
-                                           kernel_size=[1, 5],
+                                           kernel_size=[1, 10],  # [1, 5] for cyclegan-vc2
                                            stride=(1, 1),
                                            padding=(0, 2))
 
