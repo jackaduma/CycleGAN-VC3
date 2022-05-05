@@ -49,10 +49,9 @@ Non-parallel voice conversion (VC) is a technique for learning mappings between 
   - [**Table of Contents**](#table-of-contents)
   - [**Requirement**](#requirement)
   - [**Usage**](#usage)
-    - [**preprocess**](#preprocess)
-    - [**train**](#train)
+  - [**Star-History**](#star-history)
   - [**Reference**](#reference)
-  - [**Donation**](#donation) 
+  - [Donation](#donation)
   - [**License**](#license)
   
 ------
@@ -64,6 +63,12 @@ pip install -r requirements.txt
 ```
 ## **Usage**
 
+
+------
+
+## **Star-History**
+
+![star-history](https://api.star-history.com/svg?repos=jackaduma/CycleGAN-VC3&type=Date "star-history")
 
 ------
 
